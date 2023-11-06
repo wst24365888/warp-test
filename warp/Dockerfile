@@ -1,14 +1,11 @@
-FROM --platform=$BUILDPLATFORM rust:1.73 AS buildbase
-RUN rustup target add wasm32-wasi
+FROM --platform=$BUILDPLATFORM rust:1.73 AS buildstage
 WORKDIR /src
-
-FROM --platform=$BUILDPLATFORM buildbase AS buildstage
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/cache \
     --mount=type=cache,target=/usr/local/cargo/registry/index \
-    cargo build --target wasm32-wasi --release
+    cargo build --release
 
-FROM scratch
-COPY --link --from=buildstage /src/target/wasm32-wasi/release/warp.wasm warp.wasm
-ENTRYPOINT [ "warp.wasm" ]
+FROM debian:bookworm-slim
+COPY --link --from=buildstage /src/target/release/warp warp
+ENTRYPOINT [ "./warp" ]

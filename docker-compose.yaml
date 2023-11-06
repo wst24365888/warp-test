@@ -1,10 +1,8 @@
 services:
   warp:
     image: warp
-    platform: wasi/wasm
     build:
       context: ./warp
-    runtime: io.containerd.wasmedge.v1
     ports:
       - 8080:8080
   warp-wasi:
@@ -14,4 +12,4 @@ services:
       context: ./warp-wasi
     runtime: io.containerd.wasmedge.v1
     ports:
-      - 9090:9090
+      - 8081:8081
